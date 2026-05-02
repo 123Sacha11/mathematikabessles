@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Математическая кофейня - Математика без слёз</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #8b5a2b 0%, #5a3a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .game-container {
+            width: 1000px;
+            max-width: 100%;
+            background: #f5e6d3;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .screen {
+            padding: 25px;
+            min-height: 650px;
+            display: flex;
+            flex-direction: column;
+        }
+        .hidden { display: none; }
+        .start-screen {
+            text-align: center;
+            background: linear-gradient(135deg, #c49a6c 0%, #8b5a2b 100%);
+            color: white;
+            justify-content: center;
+            align-items: center;
+        }
+        .start-screen h1 { font-size: 3rem; margin-bottom: 20px; }
+        button {
+            background: #ffaa44;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: scale(1.03); }
+        .cafe-screen { background: #f5e6d3; }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #d9b48b;
+            border-radius: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .profit {
+            background: #2c2c2c;
+            color: #ffaa44;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .difficulty-select {
+            padding: 8px 15px;
+            font-size: 1rem;
+            border-radius: 20px;
+            border: none;
+            background: white;
+        }
+        .shop-btn, .upgrade-btn {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+        }
+        .guest-area {
+            background: #fff0e0;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .guest-card {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .guest-avatar {
+            font-size: 3.5rem;
+            background: #d9b48b;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .guest-info { flex: 1; }
+        .guest-name { font-size: 1.5rem; font-weight: bold; color: #8b5a2b; }
+        .guest-story { color: #666; margin: 5px 0; }
+        .guest-order { font-size: 1.2rem; margin: 10px 0; }
+        .drink-image {
+            width: 120px;
+            height: 120px;
+            background: #e8d0a0;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            text-align: center;
+        }
+        .drink-name { font-size: 0.8rem; color: #8b5a2b; margin-top: 5px; }
+        .math-panel {
+            background: #2c2c2c;
+            border-radius: 20px;
+            padding: 20px;
+            color: white;
+        }
+        .inequality-display {
+            background: #1e2a1d;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 1.3rem;
+        }
+        .answer-panel {
+            background: #fff8e8;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+        .interval-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        .interval-btn {
+            background: #ffaa44;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #333;
+            transition: 0.2s;
+        }
+        .interval-btn:hover { background: #ff8844; transform: scale(1.02); }
+        .interval-btn.selected { background: #28a745; color: white; }
+        .submit-btn { background: #28a745; margin-top: 0; }
+        .feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; }
+        .next-btn { background: #ffaa44; margin-top: 15px; width: 100%; }
+        .shop-screen, .upgrade-screen {
+            background: #f5e6d3;
+            text-align: center;
+        }
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .shop-item, .upgrade-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .shop-item:hover, .upgrade-item:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .shop-item.bought { opacity: 0.7; background: #e0e0e0; cursor: default; }
+        .item-price { color: #ffaa44; font-weight: bold; margin-top: 10px; font-size: 1.2rem; }
+        .owned { background: #28a745; color: white; padding: 5px; border-radius: 10px; margin-top: 10px; }
+        .result-screen {
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            background: #f5e6d3;
+        }
+        .final-profit { font-size: 2rem; color: #ffaa44; margin: 20px 0; }
+        .rating { font-size: 1.5rem; margin: 20px 0; }
+        .accessories {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 15px;
+            border-radius: 15px;
+            color: white;
+            font-size: 0.9rem;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div id="startScreen" class="screen start-screen">
+        <h1>☕ Математическая кофейня ☕</h1>
+        <p style="font-size: 1.2rem;">Решай неравенства, готовь напитки, зарабатывай!</p>
+        <button id="playBtn">🍵 ОТКРЫТЬ КОФЕЙНЮ</button>
+    </div>
+
+    <div id="gameScreen" class="screen hidden cafe-screen">
+        <div class="top-bar">
+            <div class="profit">💰 Баланс: <span id="profit">0</span> руб</div>
+            <div>
+                <select id="difficultySelect" class="difficulty-select">
+                    <option value="easy">☕ Бармен (квадратные неравенства)</option>
+                    <option value="normal">🍵 Менеджер (рациональные неравенства)</option>
+                    <option value="hard">✨ Шеф-бариста (системы неравенств)</option>
+                </select>
+                <button id="shopBtn" class="shop-btn">🛍️ МАГАЗИН</button>
+                <button id="upgradeBtn" class="upgrade-btn">⬆️ ПРОКАЧКА</button>
+            </div>
+        </div>
+
+        <div class="guest-area" id="guestArea">
+            <div class="guest-card">
+                <div class="guest-avatar" id="guestAvatar">👩‍🎓</div>
+                <div class="guest-info">
+                    <div class="guest-name" id="guestName">Анна</div>
+                    <div class="guest-story" id="guestStory">"Готовлюсь к экзамену, нужен крепкий кофе"</div>
+                    <div class="guest-order">📝 Заказ: <span id="guestOrder">Пифагоров эспрессо</span></div>
+                </div>
+                <div class="drink-image">
+                    <span id="drinkEmoji">☕</span>
+                    <div class="drink-name" id="drinkName">Пифагоров эспрессо</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="math-panel">
+            <div class="inequality-display" id="inequalityDisplay">x² − 4 ≥ 0</div>
+            <div class="answer-panel">
+                <p>📐 Выбери правильный интервал:</p>
+                <div id="intervalControls" class="interval-buttons"></div>
+            </div>
+            <div class="answer-area">
+                <button id="submitBtn" class="submit-btn">🍳 ПРИГОТОВИТЬ</button>
+                <div id="feedback" class="feedback"></div>
+                <button id="nextBtn" class="next-btn" style="display: none;">➡️ СЛЕДУЮЩИЙ ГОСТЬ</button>
+            </div>
+        </div>
+        
+        <div class="accessories" id="accessoriesDisplay"></div>
+    </div>
+
+    <div id="shopScreen" class="screen hidden">
+        <h2>🛍️ МАГАЗИН АКСЕССУАРОВ 🛍️</h2>
+        <p>Аксессуары украшают кофейню и увеличивают прибыль!</p>
+        <div class="shop-items" id="shopItems"></div>
+        <button id="closeShopBtn">🔙 ВЕРНУТЬСЯ В КОФЕЙНЮ</button>
+    </div>
+
+    <div id="upgradeScreen" class="screen hidden">
+        <h2>⬆️ ПРОКАЧКА КОФЕЙНИ ⬆️</h2>
+        <p>Улучшай кофейню, чтобы зарабатывать больше!</p>
+        <div class="shop-items" id="upgradeItems"></div>
+        <button id="closeUpgradeBtn">🔙 ВЕРНУТЬСЯ В КОФЕЙНЮ</button>
+    </div>
+
+    <div id="resultScreen" class="screen hidden">
+        <h2>🏆 КОНЕЦ ДНЯ 🏆</h2>
+        <div class="final-profit" id="finalProfit">0 руб</div>
+        <div class="rating" id="rating">⭐⭐⭐</div>
+        <p id="ratingText"></p>
+        <button id="continueBtn">🔄 ПРОДОЛЖИТЬ РАБОТУ</button>
+        <button id="exitBtn" style="background: #6c757d;">🚪 ВЫХОД</button>
+    </div>
+</div>
+
+<script>
+    // ==================== ДАННЫЕ ====================
+    let difficulty = 'easy';
+    let totalProfit = 0;
+    let currentSessionProfit = 0;
+    let guestsServed = 0;
+    let currentGuest = null;
+    let selectedAnswer = null;
+    let waitingForNext = false;
+    
+    let ownedAccessories = { decor: [], mug: [], uniform: [] };
+    
+    let upgrades = {
+        coffeeMachine: { level: 1, price: 3000, bonus: 0.1, name: "☕ Кофемашина", description: "+10% к прибыли" },
+        interior: { level: 1, price: 2500, bonus: 0.08, name: "🏠 Интерьер", description: "+8% к прибыли" },
+        staff: { level: 1, price: 4000, bonus: 0.12, name: "👥 Персонал", description: "+12% к прибыли" }
+    };
+    
+    const shopItems = [
+        { id: 'decor_plants', name: '🌿 Экзотические растения', price: 2500, category: 'decor', emoji: '🌿', bonus: 0.05 },
+        { id: 'decor_lamp', name: '💡 Винтажная люстра', price: 3500, category: 'decor', emoji: '💡', bonus: 0.08 },
+        { id: 'decor_painting', name: '🎨 Картина "Теорема"', price: 5000, category: 'decor', emoji: '🎨', bonus: 0.12 },
+        { id: 'mug_rainbow', name: '🌈 Радужная кружка', price: 2000, category: 'mug', emoji: '🌈', bonus: 0.04 },
+        { id: 'mug_math', name: '📐 Кружка "Формула"', price: 2800, category: 'mug', emoji: '📐', bonus: 0.06 },
+        { id: 'mug_gold', name: '👑 Золотая кружка', price: 6000, category: 'mug', emoji: '👑', bonus: 0.15 },
+        { id: 'uniform_apron', name: '👨‍🍳 Кожаный фартук', price: 2200, category: 'uniform', emoji: '👨‍🍳', bonus: 0.05 },
+        { id: 'uniform_hat', name: '🎩 Шляпа бариста', price: 3000, category: 'uniform', emoji: '🎩', bonus: 0.07 },
+        { id: 'uniform_suit', name: '🤵 Фирменный костюм', price: 7000, category: 'uniform', emoji: '🤵', bonus: 0.18 }
+    ];
+    
+    const thanksMessages = {
+        easy: ["Спасибо, отличный кофе!", "Вкусно! Теперь я готов к экзамену!", "Лучший эспрессо в городе!", "То, что нужно для бодрости!", "Обязательно приду ещё!"],
+        normal: ["Идеальный баланс вкуса!", "Шедевр! Спасибо бариста!", "Такой кофе редко встретишь!", "Вы настоящий мастер!", "Превосходно!"],
+        hard: ["Невероятно! Сложнейший рецепт удался!", "Вы гений кофейного дела!", "Даже Ящер оценил бы!", "Математика и кофе — идеальное сочетание!", "Это был лучший кофе в моей жизни!"]
+    };
+    
+    // БИБЛИОТЕКА НЕРАВЕНСТВ С ПРАВИЛЬНЫМИ ОТВЕТАМИ
+    const inequalitiesLibrary = {
+        easy: [
+            { text: "x² − 4 ≥ 0", answer: "(-∞; -2] ∪ [2; ∞)" },
+            { text: "x² − 5x + 6 < 0", answer: "(2; 3)" },
+            { text: "x² - 9 ≤ 0", answer: "[-3; 3]" },
+            { text: "x² - 16 > 0", answer: "(-∞; -4) ∪ (4; ∞)" },
+            { text: "x² - 2x - 3 ≤ 0", answer: "[-1; 3]" },
+            { text: "x² - 1 < 0", answer: "(-1; 1)" },
+            { text: "x² - 2x + 1 > 0", answer: "(-∞; 1) ∪ (1; ∞)" },
+            { text: "x² - 25 ≥ 0", answer: "(-∞; -5] ∪ [5; ∞)" },
+            { text: "x² - 36 < 0", answer: "(-6; 6)" },
+            { text: "x² + 2x - 8 ≤ 0", answer: "[-4; 2]" }
+        ],
+        normal: [
+            { text: "(x+1)/(x-3) ≤ 0", answer: "[-1; 3)" },
+            { text: "(x-2)/(x+1) > 0", answer: "(-∞; -1) ∪ (2; ∞)" },
+            { text: "(x+2)/(x-1) ≥ 0", answer: "(-∞; -2] ∪ (1; ∞)" },
+            { text: "(x-5)/(x+3) ≥ 0", answer: "(-∞; -3) ∪ [5; ∞)" },
+            { text: "(x+3)/(x-4) < 0", answer: "(-3; 4)" },
+            { text: "(x-1)/(x+2) ≤ 0", answer: "(-2; 1]" },
+            { text: "(x²-4)/(x-2) > 0", answer: "(-∞; -2) ∪ (2; ∞)" },
+            { text: "(x²-9)/(x+3) < 0", answer: "(-∞; -3) ∪ (-3; 3)" }
+        ],
+        hard: [
+            { text: "{ (x-2)/(x+1) > 0, x² - 9 ≤ 0 }", answer: "[-3; -1) ∪ (2; 3]" },
+            { text: "{ (x-1)/(x+2) ≥ 0, x² - 16 < 0 }", answer: "(-4; -2) ∪ [1; 4)" },
+            { text: "{ (x+3)/(x-1) ≤ 0, x² - 4 ≥ 0 }", answer: "[-3; -2] ∪ (1; 2]" },
+            { text: "{ |x-2| < 3, x² - 9 ≥ 0 }", answer: "[-3; -1) ∪ (5; 5)" },
+            { text: "{ (x+4)/(x-2) < 0, x² - 1 ≥ 0 }", answer: "[-4; -1] ∪ [1; 2)" },
+            { text: "{ x² - 4x + 3 ≥ 0, (x+2)/(x-1) < 0 }", answer: "(-2; 1)" },
+            { text: "{ (x²-1)/(x+2) ≥ 0, x² - 9 ≤ 0 }", answer: "[-3; -2) ∪ [-1; 1] ∪ (2; 3]" }
+        ]
+    };
+    
+    // Генерация вариантов с правильным в случайной позиции
+    function generateOptions(correctAnswer) {
+        const wrongOptions = [
+            "(-∞; 0) ∪ (0; ∞)", "[-5; 5]", "(-∞; 3)", "(2; 5)", "[-2; 2]",
+            "(-∞; -1) ∪ (1; ∞)", "(-3; 3)", "(-∞; -2] ∪ [2; ∞)", "[0; ∞)",
+            "(-∞; 1) ∪ (1; ∞)", "(-4; 4)", "(-∞; -3) ∪ (3; ∞)", "[-1; 2]",
+            "(-∞; -2) ∪ (-2; ∞)", "(-∞; 0)", "(0; ∞)", "(-∞; -5] ∪ [5; ∞)"
+        ];
+        let available = wrongOptions.filter(w => w !== correctAnswer);
+        let opts = [correctAnswer];
+        while (opts.length < 3) {
+            let rand = available[Math.floor(Math.random() * available.length)];
+            if (!opts.includes(rand)) opts.push(rand);
+        }
+        for (let i = opts.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [opts[i], opts[j]] = [opts[j], opts[i]];
+        }
+        return opts;
+    }
+    
+    // ПЕРСОНАЖИ с обновлёнными иконками
+    const characters = {
+        easy: [
+            { name: "Анна", avatar: "👩‍🎓", story: "Готовлюсь к экзамену, нужен крепкий кофе", basePrice: 150, drinkEmoji: "☕", drinkName: "Пифагоров эспрессо" },
+            { name: "Валера (бомж)", avatar: "🧥", story: "Эй, братан... есть мелочь на кофе?", basePrice: 50, drinkEmoji: "🥤", drinkName: "Дешёвый растворимый" },
+            { name: "Дмитрий", avatar: "👨‍💼", story: "Нужно сосредоточиться перед важной встречей", basePrice: 180, drinkEmoji: "☕", drinkName: "Дискриминантный лунго" },
+            { name: "Елена", avatar: "👩‍🎨", story: "Люблю кофе с кислинкой", basePrice: 170, drinkEmoji: "☕", drinkName: "Параболический американо" },
+            { name: "Михаил", avatar: "👨‍🔬", story: "Ищу идеальный баланс", basePrice: 190, drinkEmoji: "☕", drinkName: "Квадратный кортадо" },
+            { name: "Наталья", avatar: "👩‍⚕️", story: "Кофе помогает мне работать", basePrice: 160, drinkEmoji: "☕", drinkName: "Вершинный флэт" },
+            { name: "Кот Финдус", avatar: "🐱", story: "Мяу... Мяу! (хочу молока)", basePrice: 80, drinkEmoji: "🥛", drinkName: "Тёплое молоко" }
+        ],
+        normal: [
+            { name: "Мария", avatar: "👩‍🎨", story: "Рисую утро, нужно что-то сладкое", basePrice: 280, drinkEmoji: "🥛", drinkName: "Рациональный латте" },
+            { name: "Игорь", avatar: "🏃‍♂️", story: "После тренировки нужно восстановиться", basePrice: 290, drinkEmoji: "🥤", drinkName: "Интервальный раф" },
+            { name: "Ольга", avatar: "👩‍⚕️", story: "Хочу что-то необычное", basePrice: 270, drinkEmoji: "☕", drinkName: "Дробный капучино" },
+            { name: "Профилич", avatar: "👨‍🏫", story: "Готовлю детей к профильной математике!", basePrice: 500, drinkEmoji: "📚", drinkName: "Профильный эспрессо" },
+            { name: "Пришелец", avatar: "👽🛸", story: "Зиг-заг, блабла...", basePrice: 350, drinkEmoji: "🛸", drinkName: "Галактический латте" },
+            { name: "Кофеиноберг", avatar: "🎩🕶️", story: "Мне нужен чистый кофеин... для научных целей", basePrice: 600, drinkEmoji: "⚗️", drinkName: "Кристаллический экстракт" }
+        ],
+        hard: [
+            { name: "Ящер Иванко Вальеревич", avatar: "🐊👨‍🏫", story: "Я составитель ЕГЭ! Сделай сложный напиток!", basePrice: 1000, drinkEmoji: "🔥", drinkName: "Абсолютный интеграл" },
+            { name: "Мисет Дрист", avatar: "💎📹", story: "Снимаю видос для ЯТуба!", basePrice: 800, drinkEmoji: "📹", drinkName: "Блогерский спешелти" },
+            { name: "София", avatar: "👩‍🍳", story: "Ищу вдохновение для десерта", basePrice: 450, drinkEmoji: "✨", drinkName: "Системный спешелти" },
+            { name: "Алексей", avatar: "✍️", story: "Пишу роман о путешествиях", basePrice: 420, drinkEmoji: "🌟", drinkName: "Комплексный раф" },
+            { name: "Виктория", avatar: "🎓", story: "Защищаю диссертацию", basePrice: 480, drinkEmoji: "∞", drinkName: "Бесконечный эспрессо" },
+            { name: "Константин", avatar: "🧪", story: "Люблю эксперименты", basePrice: 460, drinkEmoji: "🧪", drinkName: "Модульный раф" }
+        ]
+    };
+    
+    function getRandomGuest() {
+        const list = characters[difficulty];
+        const index = Math.floor(Math.random() * list.length);
+        const character = { ...list[index] };
+        
+        if (character.name === "Кот Финдус") {
+            character.drinkName = "Тёплое молоко";
+            character.drinkEmoji = "🥛";
+        }
+        
+        const lib = inequalitiesLibrary[difficulty];
+        const inequalityData = lib[Math.floor(Math.random() * lib.length)];
+        const options = generateOptions(inequalityData.answer);
+        
+        return {
+            ...character,
+            inequality: inequalityData.text,
+            answer: inequalityData.answer,
+            options: options
+        };
+    }
+    
+    function calculateBonus() {
+        let bonus = 1;
+        ownedAccessories.decor.forEach(item => bonus += item.bonus);
+        ownedAccessories.mug.forEach(item => bonus += item.bonus);
+        ownedAccessories.uniform.forEach(item => bonus += item.bonus);
+        bonus += upgrades.coffeeMachine.bonus * upgrades.coffeeMachine.level;
+        bonus += upgrades.interior.bonus * upgrades.interior.level;
+        bonus += upgrades.staff.bonus * upgrades.staff.level;
+        return bonus;
+    }
+    
+    function loadTask() {
+        waitingForNext = false;
+        selectedAnswer = null;
+        currentGuest = getRandomGuest();
+        
+        document.getElementById('guestAvatar').innerHTML = currentGuest.avatar;
+        document.getElementById('guestName').innerHTML = currentGuest.name;
+        document.getElementById('guestStory').innerHTML = `"${currentGuest.story}"`;
+        document.getElementById('guestOrder').innerHTML = currentGuest.drinkName;
+        document.getElementById('drinkEmoji').innerHTML = currentGuest.drinkEmoji;
+        document.getElementById('drinkName').innerHTML = currentGuest.drinkName;
+        document.getElementById('inequalityDisplay').innerHTML = currentGuest.inequality;
+        
+        const container = document.getElementById('intervalControls');
+        container.innerHTML = '';
+        currentGuest.options.forEach(opt => {
+            const btn = document.createElement('div');
+            btn.className = 'interval-btn';
+            btn.textContent = opt;
+            btn.onclick = () => {
+                document.querySelectorAll('.interval-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedAnswer = opt;
+            };
+            container.appendChild(btn);
+        });
+        
+        document.getElementById('feedback').className = 'feedback';
+        document.getElementById('feedback').innerHTML = '';
+        document.getElementById('submitBtn').style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'none';
+        
+        updateAccessoriesDisplay();
+    }
+    
+    function checkAnswer() {
+        if (waitingForNext) return;
+        
+        if (!selectedAnswer) {
+            document.getElementById('feedback').className = 'feedback wrong';
+            document.getElementById('feedback').innerHTML = '⚠️ Выбери интервал!';
+            return;
+        }
+        
+        const isCorrect = (selectedAnswer === currentGuest.answer);
+        
+        if (isCorrect) {
+            let bonus = calculateBonus();
+            let earn = Math.floor(currentGuest.basePrice * bonus);
+            totalProfit += earn;
+            currentSessionProfit += earn;
+            document.getElementById('profit').innerHTML = totalProfit;
+            guestsServed++;
+            
+            const thanksList = thanksMessages[difficulty];
+            const thanks = thanksList[Math.floor(Math.random() * thanksList.length)];
+            
+            document.getElementById('feedback').className = 'feedback correct';
+            document.getElementById('feedback').innerHTML = `✅ ${thanks} +${earn} руб (бонус x${bonus.toFixed(1)})`;
+        } else {
+            document.getElementById('feedback').className = 'feedback wrong';
+            document.getElementById('feedback').innerHTML = `❌ Ошибка! Правильный ответ: ${currentGuest.answer}`;
+            setTimeout(() => {
+                document.getElementById('feedback').className = 'feedback';
+                document.getElementById('feedback').innerHTML = '';
+            }, 2000);
+            return;
+        }
+        
+        waitingForNext = true;
+        document.getElementById('submitBtn').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'block';
+        
+        if (guestsServed >= 10) {
+            endDay();
+        }
+    }
+    
+    function endDay() {
+        document.getElementById('finalProfit').innerHTML = currentSessionProfit + ' руб';
+        let stars = '';
+        let ratingText = '';
+        if (currentSessionProfit >= 6000) {
+            stars = '⭐⭐⭐⭐⭐';
+            ratingText = '🏆 ЗВЁЗДНЫЙ БАРИСТА!';
+        } else if (currentSessionProfit >= 4000) {
+            stars = '⭐⭐⭐⭐';
+            ratingText = '☕ ОТЛИЧНАЯ РАБОТА!';
+        } else if (currentSessionProfit >= 2500) {
+            stars = '⭐⭐⭐';
+            ratingText = '🍵 ХОРОШО, НО МОЖНО ЛУЧШЕ';
+        } else {
+            stars = '⭐⭐';
+            ratingText = '📚 НУЖНО ПОДТЯНУТЬ МАТЕМАТИКУ';
+        }
+        document.getElementById('rating').innerHTML = stars;
+        document.getElementById('ratingText').innerHTML = ratingText;
+        document.getElementById('gameScreen').classList.add('hidden');
+        document.getElementById('resultScreen').classList.remove('hidden');
+    }
+    
+    function continueGame() {
+        guestsServed = 0;
+        currentSessionProfit = 0;
+        loadTask();
+        document.getElementById('gameScreen').classList.remove('hidden');
+        document.getElementById('resultScreen').classList.add('hidden');
+    }
+    
+    function updateAccessoriesDisplay() {
+        const display = document.getElementById('accessoriesDisplay');
+        let text = '✨ Аксессуары: ';
+        let hasAny = false;
+        if (ownedAccessories.decor.length) { text += ownedAccessories.decor.map(a => a.emoji).join(' '); hasAny = true; }
+        if (ownedAccessories.mug.length) { text += ' ' + ownedAccessories.mug.map(a => a.emoji).join(' '); hasAny = true; }
+        if (ownedAccessories.uniform.length) { text += ' ' + ownedAccessories.uniform.map(a => a.emoji).join(' '); hasAny = true; }
+        if (!hasAny) text += 'нет';
+        display.innerHTML = text;
+    }
+    
+    function openShop() {
+        document.getElementById('gameScreen').classList.add('hidden');
+        document.getElementById('shopScreen').classList.remove('hidden');
+        
+        const container = document.getElementById('shopItems');
+        container.innerHTML = '';
+        shopItems.forEach(item => {
+            const isOwned = ownedAccessories[item.category].some(a => a.id === item.id);
+            const div = document.createElement('div');
+            div.className = 'shop-item';
+            if (isOwned) div.classList.add('bought');
+            div.innerHTML = `
+                <div style="font-size:3rem">${item.emoji}</div>
+                <h3>${item.name}</h3>
+                <p>+${Math.floor(item.bonus * 100)}% к прибыли</p>
+                <div class="item-price">💰 ${item.price} руб</div>
+                ${isOwned ? '<div class="owned">✅ УЖЕ КУПЛЕНО</div>' : ''}
+            `;
+            div.onclick = () => {
+                if (isOwned) {
+                    alert('У вас уже есть этот аксессуар!');
+                    return;
+                }
+                if (totalProfit >= item.price) {
+                    totalProfit -= item.price;
+                    ownedAccessories[item.category].push(item);
+                    document.getElementById('profit').innerHTML = totalProfit;
+                    updateAccessoriesDisplay();
+                    openShop();
+                    alert(`🎉 Вы купили ${item.name}! Теперь прибыль увеличена на ${Math.floor(item.bonus * 100)}%`);
+                } else {
+                    alert(`❌ Недостаточно средств! Нужно ${item.price} руб`);
+                }
+            };
+            container.appendChild(div);
+        });
+    }
+    
+    function openUpgrade() {
+        document.getElementById('gameScreen').classList.add('hidden');
+        document.getElementById('upgradeScreen').classList.remove('hidden');
+        
+        const container = document.getElementById('upgradeItems');
+        container.innerHTML = '';
+        for (let [key, upgrade] of Object.entries(upgrades)) {
+            const nextLevel = upgrade.level + 1;
+            const price = upgrade.price * nextLevel;
+            const div = document.createElement('div');
+            div.className = 'upgrade-item';
+            div.innerHTML = `
+                <div style="font-size:3rem">${upgrade.name.split(' ')[0]}</div>
+                <h3>${upgrade.name}</h3>
+                <p>${upgrade.description}</p>
+                <p>Уровень: ${upgrade.level}</p>
+                <p>Следующий уровень: +${Math.floor(upgrade.bonus * 100)}%</p>
+                <div class="item-price">💰 ${price} руб</div>
+            `;
+            div.onclick = () => {
+                if (totalProfit >= price) {
+                    totalProfit -= price;
+                    upgrade.level++;
+                    document.getElementById('profit').innerHTML = totalProfit;
+                    openUpgrade();
+                    alert(`🎉 ${upgrade.name} улучшен до уровня ${upgrade.level}!`);
+                } else {
+                    alert(`❌ Недостаточно средств! Нужно ${price} руб`);
+                }
+            };
+            container.appendChild(div);
+        }
+    }
+    
+    function startGame() {
+        totalProfit = 0;
+        currentSessionProfit = 0;
+        guestsServed = 0;
+        selectedAnswer = null;
+        waitingForNext = false;
+        ownedAccessories = { decor: [], mug: [], uniform: [] };
+        upgrades = {
+            coffeeMachine: { level: 1, price: 3000, bonus: 0.1, name: "☕ Кофемашина", description: "+10% к прибыли" },
+            interior: { level: 1, price: 2500, bonus: 0.08, name: "🏠 Интерьер", description: "+8% к прибыли" },
+            staff: { level: 1, price: 4000, bonus: 0.12, name: "👥 Персонал", description: "+12% к прибыли" }
+        };
+        document.getElementById('profit').innerHTML = '0';
+        document.getElementById('startScreen').classList.add('hidden');
+        document.getElementById('gameScreen').classList.remove('hidden');
+        document.getElementById('resultScreen').classList.add('hidden');
+        document.getElementById('shopScreen').classList.add('hidden');
+        document.getElementById('upgradeScreen').classList.add('hidden');
+        loadTask();
+    }
+    
+    function init() {
+        document.getElementById('playBtn').onclick = startGame;
+        document.getElementById('difficultySelect').onchange = () => {
+            difficulty = document.getElementById('difficultySelect').value;
+            loadTask();
+        };
+        document.getElementById('submitBtn').onclick = checkAnswer;
+        document.getElementById('nextBtn').onclick = () => {
+            if (waitingForNext) loadTask();
+        };
+        document.getElementById('shopBtn').onclick = openShop;
+        document.getElementById('upgradeBtn').onclick = openUpgrade;
+        document.getElementById('closeShopBtn').onclick = () => {
+            document.getElementById('shopScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            updateAccessoriesDisplay();
+        };
+        document.getElementById('closeUpgradeBtn').onclick = () => {
+            document.getElementById('upgradeScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+        };
+        document.getElementById('continueBtn').onclick = continueGame;
+        document.getElementById('exitBtn').onclick = () => {
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+        };
+    }
+    
+    init();
+</script>
+</body>
+</html>
